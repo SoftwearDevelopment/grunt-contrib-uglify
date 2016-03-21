@@ -1,8 +1,5 @@
 /*
- * grunt-contrib-uglify
- * http://gruntjs.com/
- *
- * Copyright (c) 2016 "Cowboy" Ben Alman, contributors
+ * grunt-contrib-uglify * http://gruntjs.com/ * * Copyright (c) 2016 "Cowboy" Ben Alman, contributors
  * Licensed under the MIT license.
  */
 
@@ -45,7 +42,7 @@ function normalizeLf(string) {
 
 module.exports = function(grunt) {
   // Internal lib.
-  var uglify = require('./lib/uglify').init(grunt);
+  var uglify = require('uglify-js');
 
   grunt.registerMultiTask('uglify', 'Minify files with UglifyJS.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
@@ -153,7 +150,7 @@ module.exports = function(grunt) {
       // Minify files, warn and fail on error.
       var result;
       try {
-        result = uglify.minify(src, f.dest, options);
+        result = uglify.minify(src, options);
       } catch (e) {
         console.log(e);
         err = new Error('Uglification failed.');
@@ -169,7 +166,7 @@ module.exports = function(grunt) {
       }
 
       // Concat minified source + footer
-      var output = result.min + footer;
+      var output = result.code + footer;
 
       // Only prepend banner if uglify hasn't taken care of it as part of the preamble
       if (!options.sourceMap) {
@@ -181,12 +178,12 @@ module.exports = function(grunt) {
 
       // Write source map
       if (options.sourceMap) {
-        grunt.file.write(options.generatedSourceMapName, result.sourceMap);
+        grunt.file.write(options.generatedSourceMapName, result.map);
         log.writeln('File ' + chalk.cyan(options.generatedSourceMapName) + ' created (source map).');
         createdMaps++;
       }
 
-      var outputSize = maxmin(result.max, output, options.report === 'gzip');
+      var outputSize = maxmin(src, output, options.report === 'gzip');
       log.writeln('File ' + chalk.cyan(f.dest) + ' created: ' + outputSize);
 
       createdFiles++;
